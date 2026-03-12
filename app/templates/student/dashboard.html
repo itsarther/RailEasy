@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - RailEasy{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold mb-0">Welcome back, {{ current_user.name }}! 👋</h2>
+        <p class="text-muted">Here is the overview of your concession applications.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card glass-card h-100 p-4">
+            <h6 class="text-muted text-uppercase mb-2"><i class="fas fa-file-alt"></i> Total Applications</h6>
+            <h2 class="fw-bold">{{ applications|length }}</h2>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card glass-card h-100 p-4">
+            <h6 class="text-muted text-uppercase mb-3"><i class="fas fa-satellite-dish"></i> Latest Status</h6>
+            {% if latest_app %}
+            <div class="d-flex align-items-center">
+                <div class="me-4">
+                    {% if latest_app.status == 'Pending' %}
+                    <span class="badge badge-pending rounded-pill px-3 py-2 fs-6">Pending Review</span>
+                    {% elif latest_app.status == 'Approved' %}
+                    <span class="badge badge-approved rounded-pill px-3 py-2 fs-6">Approved</span>
+                    {% else %}
+                    <span class="badge badge-rejected rounded-pill px-3 py-2 fs-6">Rejected</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <p class="mb-0 fw-bold">Applied on: {{ latest_app.date_applied.strftime('%d %b, %Y') }}</p>
+                    {% if latest_app.admin_message %}
+                    <p class="mb-0 mt-1 small text-muted"><i class="fas fa-comment-dots"></i> Admin: {{
+                        latest_app.admin_message }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">You haven't submitted any applications yet.</p>
+            <a href="{{ url_for('student.apply') }}" class="btn btn-outline-dark mt-3 rounded-pill">Apply Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Active Pass Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div
+            class="card glass-card p-4 {% if remaining_days is not none and remaining_days <= 3 %}border border-warning{% endif %}">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-ticket"></i> Active Railway Pass</h5>
+            {% if active_pass %}
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h4 class="text-primary mb-1">Expires in {{ remaining_days }} days</h4>
+                    <p class="mb-1 text-muted"><strong>Expiry Date:</strong> {{
+                        active_pass.pass_expiry_date.strftime('%d %b %Y') }}</p>
+                    <p class="mb-0"><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+                </div>
+                <div class="mt-3 mt-md-0">
+                    {% if remaining_days <= 3 %} <div class="alert alert-warning py-2 mb-2"><i
+                            class="fas fa-exclamation-triangle"></i> Warning: Your railway concession pass will expire
+                        in {{ remaining_days }} days. You can now apply for a new concession pass.</div>
+                <a href="{{ url_for('student.apply') }}" class="btn btn-primary rounded-pill px-4">Apply for New
+                    Pass</a>
+                {% else %}
+                <p class="text-muted"><i class="fas fa-info-circle"></i> Application available in {{ remaining_days - 3
+                    }} days.</p>
+                <button class="btn btn-secondary rounded-pill px-4 disabled">Apply Disabled</button>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-3">
+            <h5 class="text-danger mb-2">Pass Expired or Not Available</h5>
+            <p class="text-muted mb-3">Please apply for a new concession pass.</p>
+            <a href="{{ url_for('student.apply') }}" class="btn btn-primary rounded-pill px-4">Apply Now</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<div class="card glass-card p-4">
+    <h5 class="fw-bold mb-3">Recent Applications History</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date Applied</th>
+                    <th>Status</th>
+                    <th>Admin Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>#{{ app.id }}</td>
+                    <td>{{ app.date_applied.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if app.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif app.status == 'Approved' %}
+                        <span class="badge bg-success">Approved</span>
+                        {% else %}
+                        <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td><small class="text-muted">{{ app.admin_message or '-' }}</small></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No applications found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

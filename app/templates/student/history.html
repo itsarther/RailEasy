@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Application History - RailEasy{% endblock %}
+{% block content %}
+<div class="card glass-card p-4">
+    <h4 class="fw-bold mb-4">All Concession Applications</h4>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Application ID</th>
+                    <th>Date Applied</th>
+                    <th>Status</th>
+                    <th>Admin Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td class="fw-bold">APP-{{ app.id }}</td>
+                    <td>{{ app.date_applied.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if app.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif app.status == 'Approved' %}
+                        <span class="badge bg-success">Approved</span>
+                        {% else %}
+                        <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ app.admin_message or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">You have no application history.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

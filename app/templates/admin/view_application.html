@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}View Application - RailEasy{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card glass-card p-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Application #{{ application.id }}</h3>
+                {% if application.status == 'Pending' %}
+                <span class="badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill">Pending Review</span>
+                {% elif application.status == 'Approved' %}
+                <span class="badge bg-success px-3 py-2 fs-6 rounded-pill">Approved</span>
+                {% else %}
+                <span class="badge bg-danger px-3 py-2 fs-6 rounded-pill">Rejected</span>
+                {% endif %}
+            </div>
+
+            <div class="bg-light bg-opacity-50 p-4 rounded-3 mb-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Student Details</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-2"><strong>Name:</strong> {{ application.student.name }}</div>
+                    <div class="col-md-6 mb-2"><strong>Student ID:</strong> {{ application.student.student_id }}</div>
+                    <div class="col-md-6 mb-2"><strong>Email:</strong> {{ application.student.email }}</div>
+                    <div class="col-md-6 mb-2"><strong>Class:</strong> {{ application.student.course_class }}</div>
+                    <div class="col-md-6 mb-2"><strong>Branch:</strong> {{ application.student.branch }}</div>
+                    <div class="col-md-6 mb-2"><strong>Year:</strong> {{ application.student.year }}</div>
+                    <div class="col-md-6 mb-2"><strong>Nearest Station:</strong> {{ application.student.nearest_station
+                        }}</div>
+                    <div class="col-12 mb-2 mt-2"><strong>Address:</strong> {{ application.student.address }}</div>
+                </div>
+            </div>
+
+            <div class="bg-light bg-opacity-50 p-4 rounded-3 mb-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Pass Requirements</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-2"><strong>Journey Type:</strong> {{ application.journey_type }}</div>
+                    <div class="col-md-6 mb-2"><strong>Duration:</strong> {{ application.pass_duration }}</div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3">Uploaded Documents</h5>
+            <div class="d-flex gap-3 mb-4">
+                <a href="{{ url_for('static', filename='uploads/' + application.fee_receipt_file) }}" target="_blank"
+                    class="btn btn-outline-primary flex-fill rounded-pill py-2">
+                    <i class="fas fa-file-pdf"></i> View Fee Receipt
+                </a>
+                <a href="{{ url_for('static', filename='uploads/' + application.aadhaar_file) }}" target="_blank"
+                    class="btn btn-outline-primary flex-fill rounded-pill py-2">
+                    <i class="fas fa-id-card"></i> View Aadhaar Card
+                </a>
+            </div>
+
+            {% if application.status == 'Pending' %}
+            <h5 class="fw-bold mb-3 border-top pt-4">Admin Assessment</h5>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="mb-3">
+                    <label class="form-label text-muted">Response Message (Optional)</label>
+                    <textarea name="admin_message" class="form-control" rows="3"
+                        placeholder="Enter reason for rejection or special instructions..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" name="action" value="approve"
+                        class="btn btn-success flex-fill rounded-pill py-2 fw-bold"><i class="fas fa-check"></i> Approve
+                        Concession</button>
+                    <button type="submit" name="action" value="reject"
+                        class="btn btn-danger flex-fill rounded-pill py-2 fw-bold"><i class="fas fa-times"></i>
+                        Reject</button>
+                </div>
+            </form>
+            {% else %}
+            <div
+                class="alert mt-4 shadow-sm {% if application.status == 'Approved' %}alert-success{% else %}alert-danger{% endif %} border-0 text-center">
+                This application has already been processed. <br />
+                <strong>Current Status:</strong> {{ application.status }} <br />
+                {% if application.admin_message %}
+                <strong>Admin Remark:</strong> {{ application.admin_message }}
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

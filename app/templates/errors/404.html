@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}404 - RailEasy{% endblock %}
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="display-1 fw-bold text-dark">404</h1>
+    <h3 class="mb-4">Page Not Found</h3>
+    <p class="text-muted">The page you are looking for doesn't exist.</p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-dark rounded-pill shadow-sm"><i class="fas fa-home"></i> Back to
+        Home</a>
+</div>
+{% endblock %}

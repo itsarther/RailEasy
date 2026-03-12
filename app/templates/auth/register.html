@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Register - RailEasy{% endblock %}
+{% block content %}
+<div class="auth-card mx-auto mt-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Create Account</h2>
+        <p class="text-muted">Register to apply for concession</p>
+    </div>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col-12 mb-3">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control") }}
+                {% for error in form.name.errors %}
+                <span class="text-danger small">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.student_id.label(class="form-label") }}
+                {{ form.student_id(class="form-control") }}
+                {% for error in form.student_id.errors %}
+                <span class="text-danger small">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+                {% for error in form.email.errors %}
+                <span class="text-danger small">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.phone_number.label(class="form-label") }}
+                {{ form.phone_number(class="form-control") }}
+                {% for error in form.phone_number.errors %}
+                <span class="text-danger small">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+                {% for error in form.confirm_password.errors %}
+                <span class="text-danger small">{{ error }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="d-grid mt-3">
+            {{ form.submit(class="btn btn-dark btn-lg rounded-pill shadow-sm") }}
+        </div>
+    </form>
+    <div class="text-center mt-3">
+        <small class="text-muted">Already have an account? <a href="{{ url_for('auth.login') }}"
+                class="text-decoration-none fw-bold">Login</a></small>
+    </div>
+</div>
+
+<!-- Train Animation Container -->
+<div class="train-track-container">
+    <div class="train-track"></div>
+    <div id="interactive-train" class="train">
+        <div class="train-body">
+            <div class="train-window"></div>
+            <div class="train-window"></div>
+            <div class="train-window"></div>
+            <div id="train-headlight" class="headlight"></div>
+            <div id="train-smoke" class="smoke-container"></div>
+        </div>
+        <div class="train-wheels">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll('.form-control');
+    const emailInput = document.querySelector('input[name="email"]');
+    const submitBtn = document.querySelector('input[type="submit"]');
+    const train = document.getElementById('interactive-train');
+    const headlight = document.getElementById('train-headlight');
+    const smokeContainer = document.getElementById('train-smoke');
+
+    let trainPosition = 0;
+
+    function createSmoke() {
+        const smoke = document.createElement('div');
+        smoke.classList.add('smoke');
+        smokeContainer.appendChild(smoke);
+        setTimeout(() => smoke.remove(), 2000);
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('focus', () => headlight.style.opacity = '1');
+        emailInput.addEventListener('blur', () => headlight.style.opacity = '0');
+    }
+
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+            trainPosition = Math.min((index + 1) * 10, 60);
+            train.style.transform = `translateX(${trainPosition}vw)`;
+            if (index > 2) createSmoke();
+        });
+    });
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            train.style.transition = 'transform 1s cubic-bezier(0.5, 0, 1, 1)';
+            train.style.transform = `translateX(120vw)`;
+            setInterval(createSmoke, 100);
+        });
+    }
+</script>
+{% endblock %}

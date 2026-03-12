@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - RailEasy{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold mb-0">System Overview</h2>
+        <p class="text-muted">Manage student concession applications here.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card glass-card p-4 text-center border-start border-4 border-primary">
+            <h6 class="text-muted text-uppercase mb-2">Total Apps</h6>
+            <h2 class="fw-bold">{{ stats.total }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card glass-card p-4 text-center border-start border-4 border-warning">
+            <h6 class="text-muted text-uppercase mb-2">Pending</h6>
+            <h2 class="fw-bold">{{ stats.pending }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card glass-card p-4 text-center border-start border-4 border-success">
+            <h6 class="text-muted text-uppercase mb-2">Approved</h6>
+            <h2 class="fw-bold">{{ stats.approved }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card glass-card p-4 text-center border-start border-4 border-danger">
+            <h6 class="text-muted text-uppercase mb-2">Rejected</h6>
+            <h2 class="fw-bold">{{ stats.rejected }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card glass-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h5 class="fw-bold mb-0">Recent Applications</h5>
+        <form method="GET" action="{{ url_for('admin.dashboard') }}" class="d-flex w-100 w-md-50 max-w-500">
+            <input type="text" name="search" class="form-control rounded-pill me-2"
+                placeholder="Search by Name or Student ID..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-dark rounded-pill px-4">Search</button>
+            {% if search_query %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary rounded-pill ms-2">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Branch</th>
+                    <th>Date Applied</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>#{{ app.id }}</td>
+                    <td class="fw-bold">{{ app.student.name }}</td>
+                    <td>{{ app.student.student_id }}</td>
+                    <td>{{ app.student.branch }}</td>
+                    <td>{{ app.date_applied.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% if app.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark rounded-pill px-3">Pending</span>
+                        {% elif app.status == 'Approved' %}
+                        <span class="badge bg-success rounded-pill px-3">Approved</span>
+                        {% else %}
+                        <span class="badge bg-danger rounded-pill px-3">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.view_application', app_id=app.id) }}"
+                            class="btn btn-sm btn-outline-dark rounded-pill">View & Assess</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No applications submitted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

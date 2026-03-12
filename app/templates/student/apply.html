@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Apply for Concession - RailEasy{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card glass-card p-4 p-md-5">
+            <h3 class="fw-bold mb-4">Submit Concession Application</h3>
+
+            <div class="alert alert-info mb-4 rounded-3 border-0 bg-opacity-10">
+                <i class="fas fa-info-circle"></i> Please ensure your profile is up to date before applying. Ensure all
+                uploaded documents are clearly visible.
+            </div>
+
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        {{ form.journey_type.label(class="form-label fw-bold") }}
+                        {{ form.journey_type(class="form-select") }}
+                        {% for error in form.journey_type.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.pass_duration.label(class="form-label fw-bold") }}
+                        {{ form.pass_duration(class="form-select") }}
+                        {% for error in form.pass_duration.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form.fee_receipt.label(class="form-label fw-bold") }}
+                    {{ form.fee_receipt(class="form-control") }}
+                    {% for error in form.fee_receipt.errors %}
+                    <span class="text-danger small">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-4">
+                    {{ form.aadhaar_card.label(class="form-label fw-bold") }}
+                    {{ form.aadhaar_card(class="form-control") }}
+                    {% for error in form.aadhaar_card.errors %}
+                    <span class="text-danger small">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4">
+                    {{ form.submit(class="btn btn-dark btn-lg w-100 rounded-pill") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

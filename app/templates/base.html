@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RailEasy{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="{% if current_user.is_authenticated %}dashboard-body{% else %}auth-body{% endif %}">
+
+    <div class="d-flex" id="wrapper">
+
+        {% if current_user.is_authenticated %}
+        <!-- Sidebar -->
+        <div class="sidebar glass-panel" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 text-white custom-logo">
+                <i class="fa-solid fa-train-subway"></i> RailEasy
+            </div>
+            <div class="list-group list-group-flush my-3">
+                {% if current_user.role == 'student' %}
+                <a href="{{ url_for('student.dashboard') }}"
+                    class="list-group-item list-group-item-action bg-transparent text-white {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+                    <i class="fas fa-home me-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('student.profile') }}"
+                    class="list-group-item list-group-item-action bg-transparent text-white {% if request.endpoint == 'student.profile' %}active{% endif %}">
+                    <i class="fas fa-user-edit me-2"></i>Profile
+                </a>
+                <a href="{{ url_for('student.apply') }}"
+                    class="list-group-item list-group-item-action bg-transparent text-white {% if request.endpoint == 'student.apply' %}active{% endif %}">
+                    <i class="fas fa-file-signature me-2"></i>Apply Concession
+                </a>
+                <a href="{{ url_for('student.history') }}"
+                    class="list-group-item list-group-item-action bg-transparent text-white {% if request.endpoint == 'student.history' %}active{% endif %}">
+                    <i class="fas fa-history me-2"></i>History
+                </a>
+                {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}"
+                    class="list-group-item list-group-item-action bg-transparent text-white {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line me-2"></i>Admin Dashboard
+                </a>
+                {% endif %}
+            </div>
+            <div class="sidebar-footer p-3 text-center text-white mt-auto">
+                <p class="mb-2 user-email-display"><small>{{ current_user.email }}</small></p>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm w-100 rounded-pill"><i
+                        class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100 p-4">
+
+            {% if current_user.is_authenticated %}
+            <nav class="navbar navbar-expand-lg navbar-dark bg-transparent mb-4">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-dark" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="nav-item dropdown me-4">
+                            <a class="nav-link text-dark position-relative" href="#" id="notificationDropdown"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell fs-5"></i>
+                                {% set unread_notifs = current_user.notifications|selectattr("is_read", "equalto",
+                                false)|list %}
+                                {% if unread_notifs %}
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    style="font-size: 0.6rem;">
+                                    {{ unread_notifs|length }}
+                                </span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0"
+                                aria-labelledby="notificationDropdown"
+                                style="width: 320px; max-height: 400px; overflow-y: auto;">
+                                <li>
+                                    <h6 class="dropdown-header fw-bold">Notifications</h6>
+                                </li>
+                                {% if unread_notifs %}
+                                {% for notif in unread_notifs %}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <div class="dropdown-item text-wrap py-2" style="font-size: 0.9rem;">
+                                        <small class="text-muted d-block mb-1"><i class="fas fa-clock"></i> {{
+                                            notif.created_at.strftime('%d %b %H:%M') }}</small>
+                                        {{ notif.message }}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% else %}
+                                <li><span class="dropdown-item text-muted text-center py-3">No new alerts</span></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="text-dark fw-bold pe-3">
+                            <i class="fas fa-user-circle fs-5"></i> {{ current_user.name }}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            {% endif %}
+
+            <div class="container-fluid">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById("menu-toggle")?.addEventListener("click", function (e) {
+            e.preventDefault();
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+    </script>
+</body>
+
+</html>
